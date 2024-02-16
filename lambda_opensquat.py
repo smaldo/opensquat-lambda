@@ -90,5 +90,3 @@ def handler(event, context):
     print("[*] Running time: %s seconds" % end_time_squatting)
     print("")
     return { "status": 200, "body": { "urls": file_content } }
-
-print(handler({"keyword": "orsan"}, None))
