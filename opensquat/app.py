@@ -68,6 +68,7 @@ class Domain:
         self.list_dns_domains = []
         self.list_file_domains = []
         self.list_file_keywords = []
+        self.payload_keyword = None
 
         self.confidence = {
             0: "very high confidence",
@@ -373,17 +374,21 @@ class Domain:
         
         domain_total_lines = self.domain_total * self.keywords_total
         
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futs = [ executor.submit(functools.partial(self.verify_keyword, keyword, keyword_line_number, self.domain_total))
-                for keyword_line_number, keyword in enumerate(self.list_file_keywords) if keyword ]
+        # with concurrent.futures.ProcessPoolExecutor() as executor:
+        #     futs = [ executor.submit(functools.partial(self.verify_keyword, keyword, keyword_line_number, self.domain_total))
+        #         for keyword_line_number, keyword in enumerate(self.list_file_keywords) if keyword ]
         
         
-        for fut in futs:
-            result_buffer, result_domains = fut.result()
-            print(result_buffer.getvalue())
-            self.list_domains = self.list_domains + result_domains
+        # for fut in futs:
+        #     result_buffer, result_domains = fut.result()
+        #     print(result_buffer.getvalue())
+        #     self.list_domains = self.list_domains + result_domains
             
-        return self.list_domains
+        # return self.list_domains
+        result_buffer, result_domains = self.verify_keyword(self.payload_keyword, "0", self.domain_total)
+        print(result_buffer.getvalue())
+        return result_domains
+
 
     def is_site_reachable(self, domain, result_buffer):
         """
@@ -600,6 +605,7 @@ class Domain:
 
     def main(
         self,
+        payload_keyword,
         keywords_file,
         confidence_level,
         domains_file,
@@ -618,6 +624,7 @@ class Domain:
             none
         """
         print("+---------- Checking Domain Squatting ----------+")
+        self.payload_keyword = payload_keyword
         self.set_filename(keywords_file)
         self.domain_filename = domains_file
         self.set_searchPeriod(search_period)
